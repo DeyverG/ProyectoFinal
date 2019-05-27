@@ -1,3 +1,4 @@
+#Lexer
 # Lista de Tokens
 tokens = ('IDENTIFICADOR','NUMERO','SUMA','RESTA','MULTIPLICACION','DIVISION',
           'ASIGNACION','MENOR','MENORQUE','MAYOR','MAYORQUE',
