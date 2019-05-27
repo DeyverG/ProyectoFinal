@@ -78,3 +78,110 @@ def t_error(t):
 # Instanciamos el Analizador Lexico.
 import ply.lex as lex
 lexer = lex.lex()
+
+
+
+# Reglas del Parser.
+precedence = (
+    ('left', 'SUMA', 'RESTA'),
+    ('left', 'MULTIPLICACION', 'DIVISION'),
+    ('right', 'UMINUS'),
+)
+
+# Diccionario de Nombres
+nombres = {}
+
+respuesta_Parser = []
+
+def p_declaracion_asignacion(p):
+    "declaracion : IDENTIFICADOR ASIGNACION expresion"
+    nombres[p[1]] = p[3]
+
+
+def p_declaracion_expresion(p):
+    "declaracion : expresion"
+    global respuesta_Parser
+    respuesta_Parser.append(p[1])
+
+def p_expresion_uminus(p):
+    "expresion : '-' expresion %prec UMINUS"
+    p[0] = -p[2]
+
+def p_expresion_grupo(p):
+    "expresion : PARENTESIS_IZQ expresion PARENTESIS_DER"
+    p[0] = p[2]
+
+def p_prueba(p):
+    '''
+    expresion : expresion RESTA expresion
+              | expresion SUMA expresion
+              | expresion MAYOR expresion
+              | expresion MENOR expresion
+              | expresion MENORQUE expresion
+              | expresion MAYORQUE expresion
+              | expresion MULTIPLICACION expresion
+              | expresion DIVISION expresion
+              | expresion IN expresion
+    '''
+    pass
+
+def p_condi_ciclos(p):
+    '''
+    declaracion  : SI expresion  LLAVE_IZQ  LLAVE_DER
+                | SI expresion  LLAVE_IZQ declaracion LLAVE_DER
+                | SI expresion  LLAVE_IZQ expresion LLAVE_DER
+                | SINO expresion  LLAVE_IZQ  LLAVE_DER
+                | SINO expresion  LLAVE_IZQ declaracion LLAVE_DER
+                | SINO expresion  LLAVE_IZQ expresion LLAVE_DER
+                | MIENTRAS expresion  LLAVE_IZQ  LLAVE_DER
+                | MIENTRAS expresion  LLAVE_IZQ declaracion LLAVE_DER
+                | MIENTRAS expresion  LLAVE_IZQ expresion LLAVE_DER
+                | PARA expresion  LLAVE_IZQ  LLAVE_DER
+                | PARA expresion  LLAVE_IZQ declaracion LLAVE_DER
+                | PARA expresion  LLAVE_IZQ expresion LLAVE_DER
+                | DO expresion  LLAVE_IZQ  LLAVE_DER
+                | DO expresion  LLAVE_IZQ declaracion LLAVE_DER
+                | DO expresion  LLAVE_IZQ expresion LLAVE_DER
+                | SI expresion  LLAVE_IZQ declaracion expresion LLAVE_DER
+                | SI expresion  LLAVE_IZQ expresion declaracion LLAVE_DER
+                | SINO expresion  LLAVE_IZQ declaracion expresion LLAVE_DER
+                | SINO expresion  LLAVE_IZQ expresion declaracion LLAVE_DER
+                | MIENTRAS expresion  LLAVE_IZQ declaracion expresion LLAVE_DER
+                | MIENTRAS expresion  LLAVE_IZQ expresion declaracion LLAVE_DER
+                | PARA expresion  LLAVE_IZQ declaracion expresion LLAVE_DER
+                | PARA expresion  LLAVE_IZQ declaracion declaracion LLAVE_DER
+                | PARA expresion  LLAVE_IZQ expresion declaracion LLAVE_DER
+                | DO expresion  LLAVE_IZQ declaracion expresion LLAVE_DER
+                | DO expresion  LLAVE_IZQ expresion declaracion LLAVE_DER
+                
+                
+    '''
+    global respuesta_Parser
+    respuesta_Parser.append('bien')
+
+
+def p_expresion_numero(p):
+    "expresion : NUMERO"
+    p[0] = p[1]
+
+def p_expresion_nombre(p):
+    "expresion : IDENTIFICADOR"
+    global respuesta_Parser
+    try:
+        p[0] = nombres[p[1]]
+    except LookupError:
+        resultado = "Nombre no Definido '%s'" % p[1]
+        respuesta_Parser.append(resultado)
+        p[0] = 0
+
+def p_error(p):
+    global respuesta_Parser
+    if p:
+        resultado = "Error de Sintaxis en '%s'" % p.value
+        respuesta_Parser.append(resultado)
+    else:
+        resultado = "Error de Sintaxis en EOF"
+        respuesta_Parser.append(resultado)
+
+import ply.yacc as yacc
+parser = yacc.yacc()
