@@ -6,7 +6,7 @@ tokens = ('IDENTIFICADOR','NUMERO','SUMA','RESTA','MULTIPLICACION','DIVISION',
           'LLAVE_IZQ','LLAVE_DER' 
 )
 
-# Palabras Reservadas
+# Palabras Reservadas #
 reservadas = (
     'SI',
     'SINO',
